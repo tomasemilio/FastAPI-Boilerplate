@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated, override
 from uuid import UUID
 
@@ -39,6 +40,7 @@ class User(Base, table=True):
             kwargs["password"] = get_hash(kwargs["password"])
         return super().update(**kwargs)
 
+
 class UserIn(BaseModel):
     name: str
     password: str
@@ -56,6 +58,8 @@ class UserIn(BaseModel):
 
 class UserOut(BaseModel):
     id: UUID
+    created_at: datetime
+    updated_at: datetime
     name: str
     email: EmailStr
     scope: list[Role]

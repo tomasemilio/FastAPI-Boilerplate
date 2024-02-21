@@ -45,7 +45,8 @@ class Base(SQLModel):
     @classmethod
     def get(cls, id: UUID) -> Self:
         with Session(engine) as session:
-            resp = session.exec(select(cls).where(cls.id == id)).first()
+            statement = select(cls).where(cls.id == id)
+            resp = session.exec(statement).first()
             if resp is None:
                 raise not_found(f"{cls.__name__} not found.")
             return resp
@@ -61,7 +62,8 @@ class Base(SQLModel):
     @classmethod
     def all(cls) -> Sequence[Self]:
         with Session(engine) as session:
-            return session.exec(select(cls)).all()
+            statement = select(cls)
+            return session.exec(statement).all()
 
     def update(self, **kwargs) -> Self:
         with Session(engine) as session:

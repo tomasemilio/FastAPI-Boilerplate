@@ -25,16 +25,13 @@ class Config(BaseConfig):
 class TestConfig(Config):
     DB_URL: str | None = "sqlite:///test.db"
     DB_FORCE_ROLLBACK: bool = True
-    ECHO: bool = False
-    TOKEN_EXPIRE_SECONDS: int = 30 * 60
 
 
 class DevConfig(Config):
     model_config = SettingsConfigDict(
         env_file=".env", env_prefix="DEV_", extra="ignore"
     )
-    ECHO: bool = True
-    TOKEN_EXPIRE_SECONDS: int = 30 * 60
+    TOKEN_EXPIRE_SECONDS: int = 30 * 60 * 12
     LOG_LEVEL: str = "DEBUG"
 
 

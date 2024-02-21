@@ -26,7 +26,7 @@ python run.py
 
 ## Run tests.
 
-We use the `TestCongig` to run tests
+We use the `TestConfig` to run tests
 
 ```bash
 ./test.sh
@@ -38,3 +38,4 @@ We use the `TestCongig` to run tests
 - Base models with database persistence and relationships.
 - Multiple configuration files.
 - User authentication, authorization, and route protection.
+- Logging
