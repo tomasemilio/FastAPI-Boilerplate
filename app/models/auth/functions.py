@@ -25,5 +25,5 @@ def authorize(
     return Token.decode(token=token, scope=[Role(i) for i in security_scopes.scopes])
 
 
-def authorize_and_load(token: TokenDecode = Depends(authorize)) -> User:
+def authorize_and_load(token: Annotated[TokenDecode, Depends(authorize)]) -> User:
     return User.get(id=UUID(token.id))

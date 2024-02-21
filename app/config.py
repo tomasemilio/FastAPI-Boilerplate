@@ -19,12 +19,13 @@ class Config(BaseConfig):
     TOKEN_PATH: str = "api/v1/auth/token"
     ADMIN_EMAIL: EmailStr = "admin@admin.com"
     ADMIN_PASSWORD: str = "123"
+    LOG_LEVEL: str = "INFO"
 
 
 class TestConfig(Config):
     DB_URL: str | None = "sqlite:///test.db"
     DB_FORCE_ROLLBACK: bool = True
-    ECHO: bool = True
+    ECHO: bool = False
     TOKEN_EXPIRE_SECONDS: int = 30 * 60
 
 
@@ -34,6 +35,7 @@ class DevConfig(Config):
     )
     ECHO: bool = True
     TOKEN_EXPIRE_SECONDS: int = 30 * 60
+    LOG_LEVEL: str = "DEBUG"
 
 
 class ProdConfig(Config):
