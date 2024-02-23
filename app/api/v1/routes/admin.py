@@ -1,6 +1,3 @@
-from typing import Any
-from uuid import UUID
-
 from fastapi import APIRouter, Security, status
 
 from app.models.auth.functions import authorize
@@ -16,8 +13,8 @@ router = APIRouter(
 
 
 @router.get("/token", response_model=TokenEncode, status_code=status.HTTP_200_OK)
-async def get_admin_token(id: Any, scope: Role, expires_in: int):
-    return Token(id=id, scope=scope, expires_in=expires_in).encode()
+async def get_admin_token(id: str, scope: Role, expires_in: int):
+    return Token(id=id, scope=[scope], expires_in=expires_in).encode()
 
 
 @router.post("/user", response_model=UserOut, status_code=status.HTTP_201_CREATED)
@@ -31,16 +28,16 @@ async def read_users():
 
 
 @router.get("/user/{id}", response_model=UserOut, status_code=status.HTTP_200_OK)
-async def read_user(id: UUID):
+async def read_user(id: str):
     return User.get(id=id)
 
 
 @router.delete("/user/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(id: UUID):
+async def delete_user(id: str):
     User.get(id=id).delete()
 
 
 @router.patch("/user/{id}", response_model=UserOut, status_code=status.HTTP_200_OK)
-async def update_user(id: UUID, user_in: UserIn):
+async def update_user(id: str, user_in: UserIn):
     user = User.get(id=id)
     return user.update(**user_in.model_dump(exclude_unset=True))

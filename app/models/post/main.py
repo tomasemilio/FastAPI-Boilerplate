@@ -1,5 +1,4 @@
 from typing import TYPE_CHECKING
-from uuid import UUID
 
 from pydantic import BaseModel
 from sqlmodel import Field, Relationship
@@ -16,5 +15,5 @@ class PostIn(BaseModel):
 
 
 class Post(PostIn, Base, table=True):
-    user_id: UUID = Field(foreign_key="user.id")
+    user_id: str = Field(foreign_key="user.id")
     user: "User" = Relationship(back_populates="posts")

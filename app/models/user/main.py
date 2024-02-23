@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import Annotated, override
-from uuid import UUID
 
 from pydantic import (AfterValidator, BaseModel, EmailStr, ValidationInfo,
                       field_validator)
@@ -18,7 +17,8 @@ class User(Base, table=True):
     name: str
     password: Annotated[str, AfterValidator(get_hash)]
     email: Annotated[EmailStr, Field(index=True, sa_type=AutoString, unique=True)]
-    scope: Annotated[list[Role], Field(default=[Role.USER], sa_column=Column(JSON))]
+    scope: Annotated[list[Role], Field(sa_column=Column(JSON))] = [Role.USER]
+    verified: bool = False
     posts: list[Post] = Relationship(
         back_populates="user",
         sa_relationship_kwargs={"cascade": "all, delete"},
@@ -41,12 +41,11 @@ class User(Base, table=True):
         return super().update(**kwargs)
 
 
-class UserIn(BaseModel):
+class UserRegister(BaseModel):
     name: str
     password: str
     confirm_password: str
     email: EmailStr
-    scope: list[Role] = [Role.USER]
 
     @field_validator("confirm_password")
     @classmethod
@@ -56,10 +55,16 @@ class UserIn(BaseModel):
         return v
 
 
+class UserIn(UserRegister):
+    scope: list[Role] = [Role.USER]
+    verified: bool = False
+
+
 class UserOut(BaseModel):
-    id: UUID
+    id: str
     created_at: datetime
     updated_at: datetime
     name: str
     email: EmailStr
     scope: list[Role]
+    verified: bool

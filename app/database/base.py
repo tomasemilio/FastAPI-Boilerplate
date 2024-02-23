@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
-from typing import Annotated, Any, Self, Sequence
-from uuid import UUID, uuid4
+from typing import Any, Self, Sequence
+from uuid import uuid4
 
 from sqlalchemy import text
 from sqlmodel import Field, Session, SQLModel, select
@@ -10,26 +10,21 @@ from app.functions.exceptions import not_found
 
 
 class Base(SQLModel):
-    id: Annotated[UUID, Field(default_factory=uuid4, primary_key=True, index=True)]
-    created_at: Annotated[
-        datetime,
-        Field(
-            default_factory=lambda: datetime.now(UTC),
-            nullable=False,
-            sa_column_kwargs={"server_default": text("current_timestamp")},
-        ),
-    ]
-    updated_at: Annotated[
-        datetime,
-        Field(
-            default_factory=lambda: datetime.now(UTC),
-            nullable=False,
-            sa_column_kwargs={
-                "server_default": text("current_timestamp"),
-                "onupdate": text("current_timestamp"),
-            },
-        ),
-    ]
+    id: str = Field(default_factory=lambda: uuid4().hex, primary_key=True, index=True)
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        nullable=False,
+        sa_column_kwargs={"server_default": text("current_timestamp")},
+    )
+
+    updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        nullable=False,
+        sa_column_kwargs={
+            "server_default": text("current_timestamp"),
+            "onupdate": text("current_timestamp"),
+        },
+    )
 
     def __init__(self, *args, **kwargs):
         self.model_config["table"] = False
@@ -43,7 +38,7 @@ class Base(SQLModel):
             return getattr(instance, name) if hasattr(instance, name) else None
 
     @classmethod
-    def get(cls, id: UUID) -> Self:
+    def get(cls, id: str) -> Self:
         with Session(engine) as session:
             statement = select(cls).where(cls.id == id)
             resp = session.exec(statement).first()

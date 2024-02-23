@@ -1,5 +1,4 @@
 from typing import Annotated
-from uuid import UUID
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm, SecurityScopes
@@ -26,4 +25,4 @@ def authorize(
 
 
 def authorize_and_load(token: Annotated[TokenDecode, Depends(authorize)]) -> User:
-    return User.get(id=UUID(token.id))
+    return User.get(id=token.id)

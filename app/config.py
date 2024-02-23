@@ -16,6 +16,7 @@ class Config(BaseConfig):
     SECRET_KEY: str = "12345"
     ALGORITHM: str = "HS512"
     TOKEN_EXPIRE_SECONDS: int = 5 * 60
+    VERIFY_EXPIRE_SECONDS: int = 60 * 60
     TOKEN_PATH: str = "api/v1/auth/token"
     ADMIN_EMAIL: EmailStr = "admin@admin.com"
     ADMIN_PASSWORD: str = "123"
