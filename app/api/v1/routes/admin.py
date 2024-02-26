@@ -37,7 +37,6 @@ async def delete_user(id: str):
     User.get(id=id).delete()
 
 
-@router.patch("/user/{id}", response_model=UserOut, status_code=status.HTTP_200_OK)
+@router.put("/user/{id}", response_model=UserOut, status_code=status.HTTP_200_OK)
 async def update_user(id: str, user_in: UserIn):
-    user = User.get(id=id)
-    return user.update(**user_in.model_dump(exclude_unset=True))
+    return User.get(id=id).update(**user_in.model_dump(exclude_unset=True))

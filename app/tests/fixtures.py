@@ -43,3 +43,14 @@ async def created_post(async_client: AsyncClient, created_user: Response):
         json=dict(title="test", content="test"),
         headers={"Authorization": f"Bearer {token}"},
     )
+
+
+@pytest.fixture
+async def registered_user(async_client: AsyncClient) -> Response:
+    payload = dict(
+        name="test",
+        password="test",
+        confirm_password="test",
+        email="test@test.com",
+    )
+    return await async_client.post("/api/v1/user", json=payload)

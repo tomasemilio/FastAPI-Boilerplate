@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated, override
+from typing import Annotated, Self, override
 
 from pydantic import (AfterValidator, BaseModel, EmailStr, ValidationInfo,
                       field_validator)
@@ -31,14 +31,22 @@ class User(Base, table=True):
     @classmethod
     def check_email(cls, email: EmailStr) -> EmailStr:
         if cls.find(email=email):
-            conflict("Email already exists.")
+            raise conflict("Email already exists.")
         return email
 
     @override
     def update(self, **kwargs):
         if "password" in kwargs:
             kwargs["password"] = get_hash(kwargs["password"])
+        if (e := kwargs.get("email")) and e != self.email:
+            if self.find(email=e):
+                raise conflict("Email already exists.")
         return super().update(**kwargs)
+
+    def verify(self) -> Self:
+        if self.verified is True:
+            raise conflict("User already verified.")
+        return self.update(verified=True)
 
 
 class UserRegister(BaseModel):

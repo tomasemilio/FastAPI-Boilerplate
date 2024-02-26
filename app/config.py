@@ -26,6 +26,7 @@ class Config(BaseConfig):
 class TestConfig(Config):
     DB_URL: str | None = "sqlite:///test.db"
     DB_FORCE_ROLLBACK: bool = True
+    LOG_LEVEL: str = "DEBUG"
 
 
 class DevConfig(Config):
