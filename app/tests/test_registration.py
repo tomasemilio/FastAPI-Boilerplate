@@ -1,7 +1,7 @@
 import pytest
 from httpx import AsyncClient, Response
 
-from app.tests.fixtures import admin_token, registered_user
+from app.tests.fixtures import *
 
 
 @pytest.mark.anyio

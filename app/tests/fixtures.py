@@ -22,6 +22,7 @@ async def created_user(async_client: AsyncClient, admin_token: str) -> Response:
         confirm_password="test",
         email="test@test.com",
         scope=["user"],
+        verified=True,
     )
     response = await async_client.post(
         "/api/v1/admin/user",
