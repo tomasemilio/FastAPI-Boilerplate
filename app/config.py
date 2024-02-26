@@ -13,7 +13,7 @@ class Config(BaseConfig):
     DB_URL: str | None = None
     ECHO: bool = False
     DB_FORCE_ROLLBACK: bool = False
-    SECRET_KEY: str = "12345"
+    SECRET_KEY: str = "123"
     ALGORITHM: str = "HS512"
     TOKEN_EXPIRE_SECONDS: int = 5 * 60
     VERIFY_EXPIRE_SECONDS: int = 60 * 60
@@ -21,6 +21,8 @@ class Config(BaseConfig):
     ADMIN_EMAIL: EmailStr = "admin@admin.com"
     ADMIN_PASSWORD: str = "123"
     LOG_LEVEL: str = "INFO"
+    EMAIL_USERNAME: EmailStr = "sample@sample.com"
+    EMAIL_TOKEN: str = "123"
 
 
 class TestConfig(Config):
