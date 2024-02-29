@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def send_confirmation_email(email: EmailStr, url: str):
+    logger.debug(f"Sending confirmation email to {email}.")
     msg = EmailMessage()
     msg["Subject"] = "Confirm your email"
     msg["From"] = f"FastAPI Boilerplate<{config.EMAIL_USERNAME}>"
@@ -23,4 +24,4 @@ def send_confirmation_email(email: EmailStr, url: str):
     with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
         smtp.login(config.EMAIL_USERNAME, config.EMAIL_TOKEN)
         smtp.send_message(msg)
-    logger.debug(f"Confirmation email sent to {email}.")
+    logger.info(f"Confirmation email sent to {email}.")

@@ -29,6 +29,7 @@ def create():
 
 def drop_all():
     if config.ENV_STATE == "test":
+        logger.info("Dropping all tables")
         SQLModel.metadata.drop_all(bind=engine)
     else:
         raise ValueError("You can only drop all tables in test environment")

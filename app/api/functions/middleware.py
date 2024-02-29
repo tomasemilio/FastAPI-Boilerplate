@@ -5,7 +5,7 @@ from typing import Callable
 
 from fastapi import FastAPI, Request
 
-from app.database.create import create
+from app.database.functions import create
 from app.functions.logger import setup_logger
 
 logger = logging.getLogger(__name__)

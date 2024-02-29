@@ -1,3 +1,4 @@
+import logging
 from typing import Annotated
 
 from fastapi import Depends
@@ -9,6 +10,8 @@ from app.models.auth.schemes import oauth2_scheme
 from app.models.auth.token import Token, TokenDecode
 from app.models.user import User
 
+logger = logging.getLogger(__name__)
+
 
 def authenticate(credentials: OAuth2PasswordRequestForm = Depends()) -> User:
     user = User.find(email=credentials.username)
@@ -16,6 +19,7 @@ def authenticate(credentials: OAuth2PasswordRequestForm = Depends()) -> User:
         raise unauthorized_basic()
     elif user.verified is False:
         raise forbidden("User not verified. Request verification email.")
+    logger.info(f"User {user.email} authenticated.")
     return user
 
 
@@ -23,8 +27,10 @@ def authorize(
     token: Annotated[str, Depends(oauth2_scheme)],
     security_scopes: Annotated[SecurityScopes, Depends],
 ) -> TokenDecode:
+    logger.info(f"Authorizing token {token}")
     return Token.decode(token=token, scope=[Role(i) for i in security_scopes.scopes])
 
 
 def authorize_and_load(token: Annotated[TokenDecode, Depends(authorize)]) -> User:
+    logger.info(f"Authorizing and loading user {token.id}")
     return User.get(id=token.id)
