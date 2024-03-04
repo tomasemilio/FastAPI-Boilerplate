@@ -12,3 +12,5 @@ if config.DB_URL:
         connect_args=connect_args,
         pool_size=10,
     )
+else:
+    raise ValueError("No database URL provided in environment variable 'DB_URL'!")
