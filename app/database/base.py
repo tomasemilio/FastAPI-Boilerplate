@@ -1,83 +1,71 @@
 from datetime import UTC, datetime
-from typing import Any, Self, Sequence
+from typing import Self, Sequence
 from uuid import uuid4
 
-from sqlalchemy import text
-from sqlmodel import Field, Session, SQLModel, select
+from sqlalchemy import select
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.types import TIMESTAMP
 
-from app.database import engine
+from app.database.dependencies import sessDep
 from app.functions.exceptions import not_found
 
 
-class Base(SQLModel):
-    id: str = Field(default_factory=lambda: uuid4().hex, primary_key=True, index=True)
-    created_at: datetime = Field(
-        default_factory=lambda: datetime.now(UTC),
+class Base(DeclarativeBase):
+    __abstract__ = True
+    id: Mapped[str] = mapped_column(
+        primary_key=True,
+        default=lambda: uuid4().hex,
+        sort_order=-3,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        default=lambda: datetime.now(UTC),
         nullable=False,
-        sa_column_kwargs={"server_default": text("current_timestamp")},
+        sort_order=-2,
+        type_=TIMESTAMP(timezone=True),
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
+        sort_order=-1,
+        type_=TIMESTAMP(timezone=True),
     )
 
-    updated_at: datetime = Field(
-        default_factory=lambda: datetime.now(UTC),
-        nullable=False,
-        sa_column_kwargs={
-            "server_default": text("current_timestamp"),
-            "onupdate": text("current_timestamp"),
-        },
-    )
-
-    def __init__(self, *args, **kwargs):
-        self.model_config["table"] = False
-        super().__init__(*args, **kwargs)
-        self.model_config["table"] = True
-
-    def get_property(self, name: str) -> Any | None:
-        with Session(engine) as session:
-            statement = select(type(self)).where(type(self).id == self.id)
-            instance = session.exec(statement).first()
-            return getattr(instance, name) if hasattr(instance, name) else None
-
-    @classmethod
-    def get(cls, id: str) -> Self:
-        with Session(engine) as session:
-            statement = select(cls).where(cls.id == id)
-            resp = session.exec(statement).first()
-            if resp is None:
-                raise not_found(f"{cls.__name__} not found.")
-            return resp
-
-    @classmethod
-    def find(cls, **kwargs) -> Self | None:
-        with Session(engine) as session:
-            statement = select(cls)
-            for key, value in kwargs.items():
-                statement = statement.where(getattr(cls, key) == value)
-            return session.exec(statement).first()
-
-    @classmethod
-    def all(cls) -> Sequence[Self]:
-        with Session(engine) as session:
-            statement = select(cls)
-            return session.exec(statement).all()
-
-    def update(self, **kwargs) -> Self:
-        with Session(engine) as session:
-            for key, value in kwargs.items():
-                if hasattr(self, key):
-                    setattr(self, key, value)
-            session.add(self)
-            session.commit()
-            session.refresh(self)
+    async def save(self, async_session: sessDep) -> Self:
+        async_session.add(self)
+        await async_session.commit()
+        await async_session.refresh(self)
         return self
 
-    def delete(self):
-        with Session(engine) as session:
-            session.delete(self)
-            session.commit()
+    @classmethod
+    async def get(cls, async_session: sessDep, id: str) -> Self:
+        result = await async_session.get(cls, id)
+        if not result:
+            raise not_found(msg=f"{cls.__name__} not found")
+        return result
 
-    def save(self) -> Self:
-        with Session(engine) as session:
-            session.add(self)
-            session.commit()
-            session.refresh(self)
+    @classmethod
+    async def all(cls, async_session: sessDep) -> Sequence[Self]:
+        result = await async_session.execute(select(cls))
+        return result.scalars().all()
+
+    async def delete(self, async_session: sessDep):
+        await async_session.delete(self)
+        await async_session.commit()
+
+    async def update(self, async_session: sessDep, **kwargs) -> Self:
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+        await async_session.commit()
+        await async_session.refresh(self)
         return self
+
+    @classmethod
+    async def find(
+        cls, async_session: sessDep, raise_: bool = False, **kwargs
+    ) -> Self | None:
+        result = await async_session.execute(select(cls).filter_by(**kwargs))
+        result = result.scalars().first()
+        if not result and raise_:
+            raise not_found(msg=f"{cls.__name__} not found")
+        return result

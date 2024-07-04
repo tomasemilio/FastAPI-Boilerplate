@@ -9,19 +9,17 @@ from app.config import config
 logger = logging.getLogger(__name__)
 
 
-def send_confirmation_email(email: EmailStr, url: str):
-    logger.debug(f"Sending confirmation email to {email}.")
-    msg = EmailMessage()
-    msg["Subject"] = "Confirm your email"
-    msg["From"] = f"FastAPI Boilerplate<{config.EMAIL_USERNAME}>"
-    msg["To"] = email
-    msg.set_content(
-        f"""
-        Click the link below to confirm your email:
-        {url}
-        """
-    )
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-        smtp.login(config.EMAIL_USERNAME, config.EMAIL_TOKEN)
-        smtp.send_message(msg)
-    logger.info(f"Confirmation email sent to {email}.")
+def send_email(email: EmailStr, subject: str, content: str):
+    logger.debug(f"Sending email to {email}.")
+    try:
+        msg = EmailMessage()
+        msg["Subject"] = subject
+        msg["From"] = f"tomasemilio<{config.ADMIN_EMAIL}>"
+        msg["To"] = email
+        msg.set_content(content)
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(config.ADMIN_EMAIL, config.ADMIN_EMAIL_TOKEN)
+            smtp.send_message(msg)
+        logger.info(f"Email sent to {email}.")
+    except Exception as e:
+        logger.error(f"Email not sent to {email}. {e}")

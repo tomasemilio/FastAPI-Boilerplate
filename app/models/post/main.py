@@ -1,7 +1,8 @@
 from typing import TYPE_CHECKING
 
-from pydantic import BaseModel
-from sqlmodel import Field, Relationship
+from sqlalchemy import ForeignKey
+from sqlalchemy.ext.asyncio import AsyncAttrs
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
 
@@ -9,11 +10,9 @@ if TYPE_CHECKING:
     from app.models.user import User
 
 
-class PostIn(BaseModel):
-    title: str
-    content: str
-
-
-class Post(PostIn, Base, table=True):
-    user_id: str = Field(foreign_key="user.id")
-    user: "User" = Relationship(back_populates="posts")
+class Post(AsyncAttrs, Base):
+    __tablename__ = "user"
+    title: Mapped[str] = mapped_column()
+    content: Mapped[str] = mapped_column()
+    user_id: Mapped[str] = mapped_column(ForeignKey("user.id"))
+    user: Mapped["User"] = relationship(back_populates="time_deposits", lazy="select")

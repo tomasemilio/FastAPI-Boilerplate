@@ -3,7 +3,8 @@ from fastapi import APIRouter, Depends, status
 from app.functions.exceptions import not_found
 from app.models.auth.functions import authorize, authorize_and_load
 from app.models.auth.token import TokenDecode
-from app.models.post import Post, PostIn
+from app.models.post import Post
+from app.models.post.schemas import PostIn
 from app.models.user import User
 
 router = APIRouter(prefix="/post", tags=["Post"])

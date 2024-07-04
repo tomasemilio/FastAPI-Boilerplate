@@ -1,35 +1,33 @@
 import logging
+from typing import AsyncGenerator
 
-from sqlmodel import SQLModel
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import config
-from app.database import engine
-from app.models.auth.role import Role
-from app.models.post import Post
-from app.models.user import User
+from app.database import engine, local_session
 
 logger = logging.getLogger(__name__)
 
 
-def create():
-    SQLModel.metadata.create_all(bind=engine)
-
-    admin_user = User.find(email=config.ADMIN_EMAIL)
-    if not admin_user:
-        logger.info("Creating admin user")
-        admin_user = User(
-            name="admin",
-            email=config.ADMIN_EMAIL,
-            password=config.ADMIN_PASSWORD,
-            scope=[Role.ADMIN],
-            verified=True,
-        )
-        admin_user.save()
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    async with local_session() as session:
+        yield session
 
 
-def drop_all():
-    if config.ENV_STATE == "test":
-        logger.info("Dropping all tables")
-        SQLModel.metadata.drop_all(bind=engine)
+async def create_all():
+    from app.models.user import User  # noqa: F401
+
+    async with engine.begin() as conn:
+        logger.info("Creating all tables if they don't exist")
+        await conn.run_sync(User.metadata.create_all)
+
+
+async def drop_all():
+    from app.models.user import User  # noqa: F401
+
+    if config.ENV_STATE in config.DROP_ENVS:
+        async with engine.begin() as conn:
+            logger.warning("Dropping all tables")
+            await conn.run_sync(User.metadata.drop_all)
     else:
-        raise ValueError("You can only drop all tables in test environment")
+        logger.warning("Dropping tables not allowed in this environment")

@@ -6,24 +6,7 @@ from app.config import config
 from app.functions.exceptions import forbidden
 from app.functions.jwt import decode, encode
 from app.models.auth.role import Role
-
-
-class TokenEncode(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-    expires_in: int
-    scope: list[Role] = [Role.USER]
-
-
-class TokenDecode(BaseModel):
-    id: str
-    iat: datetime
-    exp: datetime
-    scope: list[Role]
-
-    @computed_field
-    def expires_in(self) -> float:
-        return (self.exp - datetime.now(UTC)).total_seconds()
+from app.models.auth.schemas import TokenDecode, TokenEncode
 
 
 class Token(BaseModel):

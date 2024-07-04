@@ -1,78 +1,27 @@
-from datetime import datetime
-from typing import Annotated, Self, override
-
-from pydantic import (AfterValidator, BaseModel, EmailStr, ValidationInfo,
-                      field_validator)
-from sqlalchemy import JSON, Column
-from sqlmodel import AutoString, Field, Relationship
+from sqlalchemy import JSON
+from sqlalchemy.ext.asyncio import AsyncAttrs
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.base import Base
-from app.functions.exceptions import conflict
 from app.functions.hash import check_hash, get_hash
 from app.models.auth.role import Role
-from app.models.post import Post
 
 
-class User(Base, table=True):
-    name: str
-    password: Annotated[str, AfterValidator(get_hash)]
-    email: Annotated[EmailStr, Field(index=True, sa_type=AutoString, unique=True)]
-    scope: Annotated[list[Role], Field(sa_column=Column(JSON))] = [Role.USER]
-    verified: bool = False
-    posts: list[Post] = Relationship(
-        back_populates="user",
-        sa_relationship_kwargs={"cascade": "all, delete"},
-    )
+class User(AsyncAttrs, Base):
+    __tablename__ = "user"
+    name: Mapped[str] = mapped_column()
+    email: Mapped[str] = mapped_column(unique=True)
+    _password: Mapped[str] = mapped_column(name="password")
+    verified: Mapped[bool] = mapped_column(default=False)
+    scope: Mapped[list[Role]] = mapped_column(JSON, nullable=False, default=[Role.USER])
 
-    def verify_password(self, password: str) -> bool:
+    @property
+    def password(self) -> str:
+        return self._password
+
+    @password.setter
+    def password(self, password: str) -> None:
+        self._password = get_hash(password)
+
+    def check_password(self, password: str) -> bool:
         return check_hash(password, self.password)
-
-    @field_validator("email")
-    @classmethod
-    def check_email(cls, email: EmailStr) -> EmailStr:
-        if cls.find(email=email):
-            raise conflict("Email already exists.")
-        return email
-
-    @override
-    def update(self, **kwargs):
-        if "password" in kwargs:
-            kwargs["password"] = get_hash(kwargs["password"])
-        if (e := kwargs.get("email")) and e != self.email:
-            if self.find(email=e):
-                raise conflict("Email already exists.")
-        return super().update(**kwargs)
-
-    def verify(self) -> Self:
-        if self.verified is True:
-            raise conflict("User already verified.")
-        return self.update(verified=True)
-
-
-class UserRegister(BaseModel):
-    name: str
-    password: str
-    confirm_password: str
-    email: EmailStr
-
-    @field_validator("confirm_password")
-    @classmethod
-    def password_match(cls, v: str, info: ValidationInfo) -> str:
-        if v != info.data["password"]:
-            raise ValueError("password and confirm_password do not match")
-        return v
-
-
-class UserIn(UserRegister):
-    scope: list[Role] = [Role.USER]
-    verified: bool = False
-
-
-class UserOut(BaseModel):
-    id: str
-    created_at: datetime
-    updated_at: datetime
-    name: str
-    email: EmailStr
-    scope: list[Role]
-    verified: bool

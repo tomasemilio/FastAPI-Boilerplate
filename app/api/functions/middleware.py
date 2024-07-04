@@ -5,8 +5,10 @@ from typing import Callable
 
 from fastapi import FastAPI, Request
 
-from app.database.functions import create
+from app.config import config
+from app.database.functions import create_all, drop_all
 from app.functions.logger import setup_logger
+from app.models.user.functions import create_admin_user
 
 logger = logging.getLogger(__name__)
 
@@ -14,9 +16,11 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     setup_logger()
-    logger.warning("Starting the application")
-    create()
+    logger.warning(f"Starting the application: ENV={config.ENV_STATE}")
+    await create_all()
+    await create_admin_user()
     yield
+    await drop_all()
     logger.warning("Shutting down the application")
 
 
