@@ -4,6 +4,11 @@ FastAPI Starter: A simple and intuitive example repository showcasing basic func
 
 ## How to get started
 
+```bash
+python3.12 -m venv env
+source env/bin/activate
+```
+
 Create a .env file following the example `example.env`
 
 `app/config.py` has 3 sets of configurations: Test, Dev, and Prod.
