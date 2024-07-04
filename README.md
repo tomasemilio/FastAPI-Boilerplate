@@ -4,7 +4,7 @@ FastAPI Starter: A simple and intuitive example repository showcasing basic func
 
 ## How to get started
 
-Create a .env file following the example `.env.example`
+Create a .env file following the example `example.env`
 
 `app/config.py` has 3 sets of configurations: Test, Dev, and Prod.
 
@@ -15,7 +15,7 @@ touch .env
 Run the following command to install dependencies. `runtime.txt` specifies the runtime version used.
 
 ```bash
-./reset.sh
+bash reset.sh
 ```
 
 ## Run the app locally
@@ -29,7 +29,7 @@ python run.py
 We use the `TestConfig` to run tests
 
 ```bash
-./test.sh
+bash test.sh
 ```
 
 ### Features

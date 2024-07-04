@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from app import app
-from app.database.create import drop_all
+from app.database.functions import drop_all
 
 
 @pytest.fixture(scope="session")
@@ -27,5 +27,5 @@ async def async_client(client: TestClient) -> AsyncGenerator:
 
 @pytest.fixture(autouse=True)
 async def clear_tables() -> AsyncGenerator:
-    drop_all()
+    await drop_all()
     yield

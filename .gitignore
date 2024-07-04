@@ -1,4 +1,5 @@
-app.log
+*.log
+app.log.*
 *.db
 playground.py
 

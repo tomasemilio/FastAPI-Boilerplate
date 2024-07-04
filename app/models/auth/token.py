@@ -1,47 +1,26 @@
 from datetime import UTC, datetime, timedelta
-from typing import Any
 
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, Field, computed_field
 
 from app.config import config
 from app.functions.exceptions import forbidden
 from app.functions.jwt import decode, encode
 from app.models.auth.role import Role
+from app.models.auth.schemas import TokenDecode, TokenEncode
 
 
-class TokenEncode(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-    expires_in: int
-    scope: list[Role] = [Role.USER]
-
-
-class TokenDecode(BaseModel):
+class Token(BaseModel):
     id: str
-    iat: datetime
-    exp: datetime
-    scope: list[Role]
+    scope: list[Role] = [Role.USER]
+    expires_in: int = config.TOKEN_EXPIRE_SECONDS
+    iat: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     @computed_field
-    def expires_in(self) -> int:
-        return int((self.exp - datetime.now(UTC)).total_seconds())
-
-
-class Token:
-    def __init__(
-        self,
-        id: Any,
-        scope: Role | list[Role],
-        expires_in: int = config.TOKEN_EXPIRE_SECONDS,
-    ):
-        self.id = id
-        self.expires_in = expires_in
-        self.scope = scope if isinstance(scope, list) else [scope]
-        self.iat: datetime = datetime.now(UTC)
-        self.exp: datetime = self.iat + timedelta(seconds=expires_in)
+    def exp(self) -> datetime:
+        return self.iat + timedelta(seconds=self.expires_in)
 
     def encode(self) -> TokenEncode:
-        token = encode(**self.__dict__)
+        token = encode(**self.model_dump())
         return TokenEncode(
             access_token=token, expires_in=self.expires_in, scope=self.scope
         )

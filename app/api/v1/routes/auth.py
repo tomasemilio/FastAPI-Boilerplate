@@ -9,7 +9,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/token", response_model=TokenEncode, status_code=status.HTTP_200_OK)
 async def token(user: User = Depends(authenticate)):
-    return Token(id=str(user.id), scope=user.scope).encode()
+    return Token(id=user.id, scope=user.scope).encode()
 
 
 @router.get("/introspect", response_model=TokenDecode, status_code=status.HTTP_200_OK)

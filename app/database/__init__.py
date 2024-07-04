@@ -1,16 +1,13 @@
-from sqlmodel import create_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.config import config
 
-if config.DB_URL:
-    connect_args = (
-        {"check_same_thread": False} if config.DB_URL.startswith("sqlite") else {}
-    )
-    engine = create_engine(
-        url=config.DB_URL,
-        pool_pre_ping=True,
-        connect_args=connect_args,
-        pool_size=10,
-    )
-else:
-    raise ValueError("No database URL provided in environment variable 'DB_URL'!")
+connect_args = (
+    {"check_same_thread": False} if config.DB_URL.startswith("sqlite") else {}
+)
+
+engine = create_async_engine(
+    config.DB_URL, connect_args=connect_args, pool_pre_ping=True
+)
+
+local_session = async_sessionmaker(engine)
