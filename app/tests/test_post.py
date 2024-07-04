@@ -14,7 +14,7 @@ async def test_post(
 ):
     user_token = await get_token(
         username=created_user.json()["email"],
-        password="test",
+        password="123",
         async_client=async_client,
     )
     post_id = created_post.json()["id"]

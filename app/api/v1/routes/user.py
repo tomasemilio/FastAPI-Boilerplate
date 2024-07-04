@@ -45,6 +45,7 @@ async def reset_password(
     async_session: sessDep,
     passwords: PasswordsIn,
     user: User = Security(authorize_and_load, scopes=[Role.RESET]),
+    token: str | None = None,  # noqa: F841
 ):
     user = await User.get(
         async_session, id=user.id
