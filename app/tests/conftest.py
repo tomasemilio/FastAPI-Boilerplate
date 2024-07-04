@@ -27,5 +27,5 @@ async def async_client(client: TestClient) -> AsyncGenerator:
 
 @pytest.fixture(autouse=True)
 async def clear_tables() -> AsyncGenerator:
-    drop_all()
+    await drop_all()
     yield

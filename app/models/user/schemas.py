@@ -12,8 +12,8 @@ class UserIn(BaseModel):
     model_config: ClassVar[ConfigDict] = ConfigDict(
         json_schema_extra={
             "example": {
-                "name": "Tomas Silva E",
-                "email": "tsilva@grupoinmotion.com",
+                "name": "John Doe",
+                "email": "example@example.com",
             },
         }
     )

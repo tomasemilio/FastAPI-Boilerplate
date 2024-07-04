@@ -2,7 +2,7 @@ import pytest
 from fastapi import Response
 from httpx import AsyncClient, Response
 
-from app.models.user import UserIn
+from app.models.user.schemas import UserIn
 from app.tests.fixtures import *
 
 
@@ -22,7 +22,6 @@ async def test_user_crud(
         name=user["name"],
         email=new_email,
         password=password,
-        confirm_password=password,
     )
 
     response = await async_client.put(

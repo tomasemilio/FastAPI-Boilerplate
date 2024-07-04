@@ -11,8 +11,8 @@ if TYPE_CHECKING:
 
 
 class Post(AsyncAttrs, Base):
-    __tablename__ = "user"
+    __tablename__ = "post"
     title: Mapped[str] = mapped_column()
     content: Mapped[str] = mapped_column()
     user_id: Mapped[str] = mapped_column(ForeignKey("user.id"))
-    user: Mapped["User"] = relationship(back_populates="time_deposits", lazy="select")
+    user: Mapped["User"] = relationship(back_populates="posts", lazy="select")

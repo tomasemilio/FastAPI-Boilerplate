@@ -1,10 +1,11 @@
 from sqlalchemy import JSON
 from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
 from app.functions.hash import check_hash, get_hash
 from app.models.auth.role import Role
+from app.models.post import Post
 
 
 class User(AsyncAttrs, Base):
@@ -14,6 +15,9 @@ class User(AsyncAttrs, Base):
     _password: Mapped[str] = mapped_column(name="password")
     verified: Mapped[bool] = mapped_column(default=False)
     scope: Mapped[list[Role]] = mapped_column(JSON, nullable=False, default=[Role.USER])
+    posts: Mapped[list[Post]] = relationship(
+        back_populates="user", lazy="select", cascade="all, delete-orphan"
+    )
 
     @property
     def password(self) -> str:
