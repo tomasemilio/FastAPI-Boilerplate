@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.database.dependencies import sessDep
-from app.models.auth.functions import authorize, authorize_and_load
+from app.models.auth.functions import authorize, authorize_and_load, authorize_limited
 from app.models.auth.token import TokenDecode
 from app.models.post import Post
 from app.models.post.schemas import PostIn, PostOut
@@ -27,6 +27,13 @@ async def get_posts(user: User = Depends(authorize_and_load)):
 @router.get("/{id}", response_model=PostOut, status_code=200)
 async def get_post(
     async_session: sessDep, id: str, token: TokenDecode = Depends(authorize)
+):
+    return await Post.find(async_session, id=id, user_id=token.id, raise_=True)
+
+
+@router.get("/rate-limited/{id}", response_model=PostOut, status_code=200)
+async def get_post_rate_limited(
+    async_session: sessDep, id: str, token: TokenDecode = Depends(authorize_limited)
 ):
     return await Post.find(async_session, id=id, user_id=token.id, raise_=True)
 

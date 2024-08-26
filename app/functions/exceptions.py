@@ -28,17 +28,11 @@ def forbidden(
 
 
 def not_found(msg: str = "Resource not found.") -> HTTPException:
-    return HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=msg,
-    )
+    return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=msg)
 
 
 def conflict(msg: str = "Resource already exists.") -> HTTPException:
-    return HTTPException(
-        status_code=status.HTTP_409_CONFLICT,
-        detail=msg,
-    )
+    return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=msg)
 
 
 def expired_token(msg: str = "Token has expired.") -> HTTPException:
@@ -50,7 +44,8 @@ def expired_token(msg: str = "Token has expired.") -> HTTPException:
 
 
 def unprocessable_entity(msg: str = "Unprocessable entity.") -> HTTPException:
-    return HTTPException(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        detail=msg,
-    )
+    return HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=msg)
+
+
+def too_many_requests(msg: str = "Too many requests") -> HTTPException:
+    return HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=msg)
