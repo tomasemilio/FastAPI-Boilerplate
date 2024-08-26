@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm, SecurityScopes
 
 from app.database.dependencies import sessDep
 from app.functions.exceptions import forbidden, unauthorized_basic
+from app.functions.limiter import rate_limiter
 from app.models.auth.role import Role
 from app.models.auth.schemas import TokenDecode, TokenEncode
 from app.models.auth.schemes import oauth2_scheme
@@ -38,6 +39,11 @@ def authorize(
 ) -> TokenDecode:
     logger.info(f"Authorizing token:{token}")
     return Token.decode(token=token, scope=[Role(i) for i in security_scopes.scopes])
+
+
+def authorize_limited(token: Annotated[TokenDecode, Depends(authorize)]) -> TokenDecode:
+    rate_limiter(token.id)
+    return token
 
 
 async def authorize_and_load(

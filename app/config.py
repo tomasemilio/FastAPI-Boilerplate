@@ -21,6 +21,7 @@ class Config(BaseConfig):
     ADMIN_PASSWORD: str = "123"
     ADMIN_EMAIL_TOKEN: str = "123"
     LOG_LEVEL: str = "DEBUG"
+    RATE_LIMITS: tuple[int, int] = (10, 60)
 
 
 class TestConfig(Config):

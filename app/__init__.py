@@ -2,8 +2,8 @@ from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI, HTTPException
 
 from app.api import router as api_router
-from app.api.functions.handlers import logger_exception_handler
-from app.api.functions.middleware import add_process_time_header, lifespan
+from app.functions.handlers import logger_exception_handler
+from app.functions.middleware import add_process_time_header, lifespan
 
 app = FastAPI(lifespan=lifespan)
 
