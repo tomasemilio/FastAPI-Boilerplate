@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends
 
 from app.database.dependencies import sessDep
@@ -26,21 +28,21 @@ async def get_posts(user: User = Depends(authorize_and_load)):
 
 @router.get("/{id}", response_model=PostOut, status_code=200)
 async def get_post(
-    async_session: sessDep, id: str, token: TokenDecode = Depends(authorize)
+    async_session: sessDep, id: UUID, token: TokenDecode = Depends(authorize)
 ):
     return await Post.find(async_session, id=id, user_id=token.id, raise_=True)
 
 
 @router.get("/rate-limited/{id}", response_model=PostOut, status_code=200)
 async def get_post_rate_limited(
-    async_session: sessDep, id: str, token: TokenDecode = Depends(authorize_limited)
+    async_session: sessDep, id: UUID, token: TokenDecode = Depends(authorize_limited)
 ):
     return await Post.find(async_session, id=id, user_id=token.id, raise_=True)
 
 
 @router.delete("/{id}", status_code=204)
 async def delete_post(
-    async_session: sessDep, id: str, token: TokenDecode = Depends(authorize)
+    async_session: sessDep, id: UUID, token: TokenDecode = Depends(authorize)
 ):
     post = await Post.find(async_session, id=id, user_id=token.id, raise_=True)
     await post.delete(async_session)  # type: ignore

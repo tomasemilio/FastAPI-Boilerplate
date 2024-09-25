@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from uuid import UUID
 
 from pydantic import BaseModel, computed_field
 
@@ -13,7 +14,7 @@ class TokenEncode(BaseModel):
 
 
 class TokenDecode(BaseModel):
-    id: str
+    id: UUID
     iat: datetime
     exp: datetime
     scope: list[Role]

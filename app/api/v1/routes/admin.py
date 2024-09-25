@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, BackgroundTasks, Security
 
 from app.api.v1.routes.user import request_reset_password
@@ -37,17 +39,17 @@ async def get_users(async_session: sessDep):
 
 
 @router.get("/user/{id}", response_model=UserOut, status_code=200)
-async def get_user(async_session: sessDep, id: str):
+async def get_user(async_session: sessDep, id: UUID):
     return await User.get(async_session, id)
 
 
 @router.delete("/user/{id}", status_code=204)
-async def delete_user(async_session: sessDep, id: str):
+async def delete_user(async_session: sessDep, id: UUID):
     user = await User.get(async_session, id)
     await user.delete(async_session)
 
 
 @router.put("/user/{id}", response_model=UserOut, status_code=200)
-async def update_user(async_session: sessDep, id: str, user_in: UserIn):
+async def update_user(async_session: sessDep, id: UUID, user_in: UserIn):
     user = await User.get(async_session, id)
     return await user.update(async_session, **user_in.model_dump(exclude_unset=True))

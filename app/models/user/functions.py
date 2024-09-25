@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 async def create_admin_user() -> User:
     async with local_session() as async_session:
-        admin = await User.find(async_session, email=config.ADMIN_EMAIL)
+        admin = await User.find(async_session, email=config.ADMIN_EMAIL, raise_=False)
         if not admin:
             logger.info("Admin user not found. Creating one.")
             admin = await User(
