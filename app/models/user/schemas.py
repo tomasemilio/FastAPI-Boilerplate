@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Annotated, ClassVar
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr, model_validator
 
@@ -26,7 +26,7 @@ class UserIn(BaseModel):
 
 class UserOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: str
+    id: UUID
     created_at: datetime
     updated_at: datetime
     name: str

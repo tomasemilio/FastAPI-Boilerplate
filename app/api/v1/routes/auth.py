@@ -1,14 +1,14 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, status
 
-from app.models.auth.functions import authenticate
-from app.models.auth.token import Token, TokenDecode, TokenEncode
-from app.models.user import User
+from app.models.auth.dependencies import userDep
+from app.models.auth.schemas import TokenDecode, TokenEncode
+from app.models.auth.token import Token
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.post("/token", response_model=TokenEncode, status_code=status.HTTP_200_OK)
-async def token(user: User = Depends(authenticate)):
+async def token(user: userDep):
     return Token(id=user.id, scope=user.scope).encode()
 
 

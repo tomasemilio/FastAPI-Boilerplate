@@ -1,10 +1,10 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, Security
+from fastapi import APIRouter, BackgroundTasks
 from pydantic import EmailStr
 
 from app.config import config
 from app.database.dependencies import sessDep
 from app.functions.emailer import send_email
-from app.models.auth.functions import authorize_and_load
+from app.models.auth.dependencies import authLoadDep, resetLoadDep
 from app.models.auth.role import Role
 from app.models.auth.token import Token
 from app.models.user import User
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/user", tags=["User"])
 
 
 @router.get("/me", response_model=UserOut, status_code=200)
-async def me(user: User = Depends(authorize_and_load)):
+async def me(user: authLoadDep):
     return user
 
 
@@ -44,7 +44,7 @@ async def request_reset_password(
 async def reset_password(
     async_session: sessDep,
     passwords: PasswordsIn,
-    user: User = Security(authorize_and_load, scopes=[Role.RESET]),
+    user: resetLoadDep,
     token: str | None = None,  # noqa: F841
 ):
     user = await User.get(

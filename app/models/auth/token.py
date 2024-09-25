@@ -1,6 +1,8 @@
 from datetime import UTC, datetime, timedelta
+from typing import Annotated
+from uuid import UUID
 
-from pydantic import BaseModel, Field, computed_field
+from pydantic import AfterValidator, BaseModel, Field, computed_field
 
 from app.config import config
 from app.functions.exceptions import forbidden
@@ -10,7 +12,7 @@ from app.models.auth.schemas import TokenDecode, TokenEncode
 
 
 class Token(BaseModel):
-    id: str
+    id: Annotated[UUID, AfterValidator(lambda x: x.hex)]
     scope: list[Role] = [Role.USER]
     expires_in: int = config.TOKEN_EXPIRE_SECONDS
     iat: datetime = Field(default_factory=lambda: datetime.now(UTC))

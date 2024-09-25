@@ -1,5 +1,4 @@
 from sqlalchemy import JSON
-from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
@@ -8,7 +7,7 @@ from app.models.auth.role import Role
 from app.models.post import Post
 
 
-class User(AsyncAttrs, Base):
+class User(Base):
     __tablename__ = "user"
     name: Mapped[str] = mapped_column()
     email: Mapped[str] = mapped_column(unique=True)

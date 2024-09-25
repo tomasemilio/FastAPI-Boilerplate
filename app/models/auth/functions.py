@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 async def authenticate(
     async_session: sessDep, credentials: OAuth2PasswordRequestForm = Depends()
 ) -> User:
-    user = await User.find(async_session, email=credentials.username)
+    user = await User.find(async_session, email=credentials.username, raise_=False)
     if not user or not user.check_password(credentials.password):
         raise unauthorized_basic()
     elif user.verified is False:
@@ -37,12 +37,17 @@ def authorize(
     token: Annotated[str, Depends(oauth2_scheme)],
     security_scopes: Annotated[SecurityScopes, Depends],
 ) -> TokenDecode:
-    logger.info(f"Authorizing token:{token}")
-    return Token.decode(token=token, scope=[Role(i) for i in security_scopes.scopes])
+    decoded_token = Token.decode(
+        token=token, scope=[Role(i) for i in security_scopes.scopes]
+    )
+    logger.info(
+        f"Authorizing user ID: {decoded_token.id} with scopes: {decoded_token.scope}"
+    )
+    return decoded_token
 
 
 def authorize_limited(token: Annotated[TokenDecode, Depends(authorize)]) -> TokenDecode:
-    rate_limiter(token.id)
+    rate_limiter(token.id.hex)
     return token
 
 

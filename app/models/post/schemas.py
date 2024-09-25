@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from pydantic import BaseModel
 
 
@@ -7,5 +9,5 @@ class PostIn(BaseModel):
 
 
 class PostOut(PostIn):
-    id: str
-    user_id: str
+    id: UUID
+    user_id: UUID
