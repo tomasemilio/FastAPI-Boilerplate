@@ -10,4 +10,5 @@ engine = create_async_engine(
     config.DB_URL, connect_args=connect_args, pool_pre_ping=True
 )
 
-local_session = async_sessionmaker(engine)
+local_session = async_sessionmaker(engine, expire_on_commit=False)
+

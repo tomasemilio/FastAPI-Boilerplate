@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, status
 
 from app.models.auth.functions import authenticate
-from app.models.auth.token import Token, TokenDecode, TokenEncode
+from app.models.auth.schemas import TokenDecode, TokenEncode
+from app.models.auth.token import Token
 from app.models.user import User
 
 router = APIRouter(prefix="/auth", tags=["Auth"])

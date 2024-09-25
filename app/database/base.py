@@ -1,8 +1,9 @@
 from datetime import UTC, datetime
 from typing import Self, Sequence
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.types import TIMESTAMP
 
@@ -10,7 +11,7 @@ from app.database.dependencies import sessDep
 from app.functions.exceptions import not_found
 
 
-class Base(DeclarativeBase):
+class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True
     id: Mapped[str] = mapped_column(
         primary_key=True,
@@ -57,7 +58,6 @@ class Base(DeclarativeBase):
         for key, value in kwargs.items():
             setattr(self, key, value)
         await async_session.commit()
-        await async_session.refresh(self)
         return self
 
     @classmethod
