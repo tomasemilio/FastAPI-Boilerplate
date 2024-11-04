@@ -1,6 +1,7 @@
-from uuid import UUID
-
 from pydantic import BaseModel
+
+from app.database.schemas import BaseOut
+from app.models.user.schemas import UserOut
 
 
 class PostIn(BaseModel):
@@ -8,6 +9,8 @@ class PostIn(BaseModel):
     content: str
 
 
-class PostOut(PostIn):
-    id: UUID
-    user_id: UUID
+class PostOut(PostIn, BaseOut): ...
+
+
+class PostDetailOut(PostIn, BaseOut):
+    user: UserOut

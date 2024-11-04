@@ -1,7 +1,9 @@
 import logging
+from uuid import UUID
 
 from app.config import config
 from app.database import local_session
+from app.database.dependencies import sessDep
 from app.models.auth.role import Role
 from app.models.user import User
 
@@ -21,3 +23,9 @@ async def create_admin_user() -> User:
                 scope=[Role.ADMIN],
             ).save(async_session=async_session)
         return admin
+
+
+async def load_user(async_session: sessDep, id: UUID) -> User:
+    return await User.get(
+        async_session=async_session, id=id, relationships=[User.posts]
+    )

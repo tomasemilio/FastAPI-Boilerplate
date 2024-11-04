@@ -19,7 +19,12 @@ logger = logging.getLogger(__name__)
 async def authenticate(
     async_session: sessDep, credentials: OAuth2PasswordRequestForm = Depends()
 ) -> User:
-    user = await User.find(async_session, email=credentials.username, raise_=False)
+    user = await User.find(
+        async_session,
+        email=credentials.username,
+        raise_=False,
+        relationships=[User.posts],
+    )
     if not user or not user.check_password(credentials.password):
         raise unauthorized_basic()
     elif user.verified is False:
@@ -54,6 +59,6 @@ def authorize_limited(token: Annotated[TokenDecode, Depends(authorize)]) -> Toke
 async def authorize_and_load(
     async_session: sessDep, token: Annotated[TokenDecode, Depends(authorize)]
 ) -> User:
-    user = await User.get(async_session, id=token.id)
+    user = await User.get(async_session, id=token.id, relationships=[User.posts])
     logger.info(f"Authorizing and loading user id:{token.id} and email:{user.email}")
     return user
