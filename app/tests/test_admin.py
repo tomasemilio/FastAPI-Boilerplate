@@ -23,7 +23,6 @@ async def test_user_crud(
         email=new_email,
         password=password,
     )
-
     response = await async_client.put(
         f"/api/v1/admin/user/{user['id']}",
         headers={"Authorization": f"Bearer {admin_token}"},
