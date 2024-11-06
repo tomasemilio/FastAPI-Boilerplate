@@ -48,7 +48,7 @@ async def reset_password(
     token: str | None = None,  # noqa: F841
 ):
     user = await User.get(
-        async_session, id=user.id, relationships=[User.posts]
+        async_session, id=user.id, relationships=[User.posts, User.tags]
     )  # sessDep not cached when using Security Scopes
     return await user.update(
         async_session, verified=True, password=passwords.password.get_secret_value()

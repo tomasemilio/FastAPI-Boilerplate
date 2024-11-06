@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.database.dependencies import sessDep
 from app.functions.exceptions import conflict
 from app.models.auth.dependencies import authDep, authLoadDep
+from app.models.post.dependencies import postDep
 from app.models.tag import Tag
 from app.models.tag.dependencies import tagDep
 from app.models.tag.schemas import TagDetailOut, TagIn, TagOut
@@ -29,3 +30,10 @@ async def get_tags(user: authLoadDep):
 @router.get("/{tag_id}", response_model=TagDetailOut, status_code=200)
 async def get_tag(tag: tagDep):
     return tag
+
+
+@router.post("/{tag_id}/post/{post_id}", response_model=TagDetailOut, status_code=201)
+async def associate_post(async_session: sessDep, tag: tagDep, post: postDep):
+    if post not in tag.posts:
+        tag.posts.append(post)
+    return await tag.save(async_session)
