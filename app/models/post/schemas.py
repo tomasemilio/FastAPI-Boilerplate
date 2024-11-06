@@ -12,5 +12,9 @@ class PostIn(BaseModel):
 class PostOut(PostIn, BaseOut): ...
 
 
+from app.models.tag.schemas import TagOut
+
+
 class PostDetailOut(PostIn, BaseOut):
     user: UserOut
+    tags: list["TagOut"]

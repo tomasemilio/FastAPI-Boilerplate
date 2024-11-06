@@ -27,7 +27,7 @@ async def create_user(
     if await User.find(async_session=async_session, email=user_in.email, raise_=False):
         raise conflict(msg="User already exists")
     user = await User(**user_in.model_dump()).save(
-        async_session, relationships=[User.posts]
+        async_session, relationships=[User.posts, User.tags]
     )
     if send_email:
         await request_reset_password(async_session, email=user.email, bt=bt)

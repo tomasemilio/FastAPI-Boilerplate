@@ -12,7 +12,7 @@ router = APIRouter(prefix="/post", tags=["Post"])
 @router.post("", response_model=PostDetailOut, status_code=201)
 async def create_post(post_in: PostIn, async_session: sessDep, token: authDep):
     return await Post(**post_in.model_dump(), user_id=token.id).save(
-        async_session, relationships=[Post.user]
+        async_session, relationships=[Post.user, Post.tags]
     )
 
 
@@ -21,16 +21,16 @@ async def get_posts(user: authLoadDep):
     return user.posts
 
 
-@router.get("/{id}", response_model=PostDetailOut, status_code=200)
+@router.get("/{post_id}", response_model=PostDetailOut, status_code=200)
 async def get_post(post: postDep):
     return post
 
 
-@router.get("/rate-limited/{id}", response_model=PostDetailOut, status_code=200)
+@router.get("/rate-limited/{post_id}", response_model=PostDetailOut, status_code=200)
 async def get_post_rate_limited(post: postDepLimit):
     return post
 
 
-@router.delete("/{id}", status_code=204)
+@router.delete("/{post_id}", status_code=204)
 async def delete_post(async_session: sessDep, post: postDep):
     await post.delete(async_session)

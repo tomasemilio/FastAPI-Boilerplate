@@ -27,7 +27,7 @@ class Authenticate:
             async_session,
             email=credentials.username,
             raise_=False,
-            relationships=[User.posts] if self.load_relationships else None,
+            relationships=[User.posts, User.tags] if self.load_relationships else None,
         )
         if not user or not user.check_password(credentials.password):
             raise unauthorized_basic()
@@ -65,6 +65,8 @@ def authorize_limited(token: Annotated[TokenDecode, Depends(authorize)]) -> Toke
 async def authorize_and_load(
     async_session: sessDep, token: Annotated[TokenDecode, Depends(authorize)]
 ) -> User:
-    user = await User.get(async_session, id=token.id, relationships=[User.posts])
+    user = await User.get(
+        async_session, id=token.id, relationships=[User.posts, User.tags]
+    )
     logger.info(f"Authorizing and loading user id:{token.id} and email:{user.email}")
     return user

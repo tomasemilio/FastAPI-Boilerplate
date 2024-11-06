@@ -27,5 +27,5 @@ async def create_admin_user() -> User:
 
 async def load_user(async_session: sessDep, id: UUID) -> User:
     return await User.get(
-        async_session=async_session, id=id, relationships=[User.posts]
+        async_session=async_session, id=id, relationships=[User.posts, User.tags]
     )

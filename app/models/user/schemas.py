@@ -43,7 +43,9 @@ class UserOut(BaseOut):
 
 
 from app.models.post.schemas import PostOut
+from app.models.tag.schemas import TagOut
 
 
 class UserDetailOut(UserOut):
     posts: list[PostOut]
+    tags: list[TagOut]
