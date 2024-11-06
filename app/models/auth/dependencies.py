@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends, Security
 
 from app.models.auth.functions import (
-    authenticate,
+    Authenticate,
     authenticate_and_token,
     authorize,
     authorize_and_load,
@@ -15,7 +15,7 @@ from app.models.user import User
 
 authDep = Annotated[TokenDecode, Depends(authorize)]
 
-userDep = Annotated[User, Depends(authenticate)]
+userDep = Annotated[User, Depends(Authenticate)]
 
 authLoadDep = Annotated[User, Depends(authorize_and_load)]
 

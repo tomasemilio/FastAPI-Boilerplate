@@ -16,24 +16,30 @@ from app.models.user import User
 logger = logging.getLogger(__name__)
 
 
-async def authenticate(
-    async_session: sessDep, credentials: OAuth2PasswordRequestForm = Depends()
-) -> User:
-    user = await User.find(
-        async_session,
-        email=credentials.username,
-        raise_=False,
-        relationships=[User.posts],
-    )
-    if not user or not user.check_password(credentials.password):
-        raise unauthorized_basic()
-    elif user.verified is False:
-        raise forbidden("User not verified. Request reset password.")
-    logger.info(f"Authenticating user id:{user.id} and email:{user.email}")
-    return user
+class Authenticate:
+    def __init__(self, load_relationships: bool = True) -> None:
+        self.load_relationships = load_relationships
+
+    async def __call__(
+        self, async_session: sessDep, credentials: OAuth2PasswordRequestForm = Depends()
+    ) -> User:
+        user = await User.find(
+            async_session,
+            email=credentials.username,
+            raise_=False,
+            relationships=[User.posts] if self.load_relationships else None,
+        )
+        if not user or not user.check_password(credentials.password):
+            raise unauthorized_basic()
+        elif user.verified is False:
+            raise forbidden("User not verified. Request reset password.")
+        logger.info(f"Authenticating user id:{user.id} and email:{user.email}")
+        return user
 
 
-async def authenticate_and_token(user: User = Depends(authenticate)) -> TokenEncode:
+async def authenticate_and_token(
+    user: User = Depends(Authenticate(load_relationships=False)),
+) -> TokenEncode:
     logger.info(f"Generating token for user id:{user.id} and email:{user.email}")
     return Token(id=user.id, scope=user.scope).encode()
 
