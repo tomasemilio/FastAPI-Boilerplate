@@ -24,6 +24,14 @@ class UserIn(BaseModel):
     scope: list[Role] = [Role.USER]
 
 
+class UserUpdate(BaseModel):
+    name: str | None = None
+    email: EmailStr | None = None
+    password: str | None = None
+    verified: bool | None = None
+    scope: list[Role] | None = None
+
+
 class PasswordsIn(BaseModel):
     password: SecretStr = Field(..., examples=["123"])
     confirm_password: SecretStr = Field(..., examples=["123"])

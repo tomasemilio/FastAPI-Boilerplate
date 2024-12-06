@@ -1,1 +1,1 @@
-ENV_STATE=test python -m pytest
+ENV_STATE=test python -m pytest -s
