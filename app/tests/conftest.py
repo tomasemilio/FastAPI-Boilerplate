@@ -2,7 +2,7 @@ from typing import AsyncGenerator, Generator
 
 import pytest
 from fastapi.testclient import TestClient
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 
 from app import app
 from app.database.functions import drop_all
@@ -21,7 +21,9 @@ def client() -> Generator:
 
 @pytest.fixture
 async def async_client(client: TestClient) -> AsyncGenerator:
-    async with AsyncClient(app=app, base_url=client.base_url) as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app), base_url=client.base_url
+    ) as ac:
         yield ac
 
 
