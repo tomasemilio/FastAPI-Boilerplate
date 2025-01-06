@@ -4,7 +4,7 @@ from pydantic import EmailStr
 from app.config import config
 from app.database.dependencies import sessDep
 from app.functions.emailer import send_email
-from app.models.auth.dependencies import authLoadDep, resetLoadDep
+from app.models.auth.dependencies import authorizeLoadDep, resetLoadDep
 from app.models.auth.role import Role
 from app.models.auth.token import Token
 from app.models.user import User
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/user", tags=["User"])
 
 
 @router.get("/me", response_model=UserDetailOut, status_code=200)
-async def me(user: authLoadDep):
+async def me(user: authorizeLoadDep):
     return user
 
 

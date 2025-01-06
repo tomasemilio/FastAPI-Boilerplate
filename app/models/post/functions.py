@@ -1,11 +1,11 @@
 from uuid import UUID
 
 from app.database.dependencies import sessDep
-from app.models.auth.dependencies import authDep, authDepLimit
+from app.models.auth.dependencies import authorizeDep, authorizeLimitDep
 from app.models.post import Post
 
 
-async def load_post(async_session: sessDep, post_id: UUID, token: authDep) -> Post:
+async def load_post(async_session: sessDep, post_id: UUID, token: authorizeDep) -> Post:
     return await Post.find(
         async_session,
         id=post_id,
@@ -16,7 +16,7 @@ async def load_post(async_session: sessDep, post_id: UUID, token: authDep) -> Po
 
 
 async def load_post_limited(
-    async_session: sessDep, post_id: UUID, token: authDepLimit
+    async_session: sessDep, post_id: UUID, token: authorizeLimitDep
 ) -> Post:
     return await Post.find(
         async_session,
