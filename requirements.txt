@@ -18,3 +18,4 @@ Jinja2
 pytailwindcss
 python-dateutil
 psycopg2-binary
+alembic

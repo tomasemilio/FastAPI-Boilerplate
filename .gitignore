@@ -1,6 +1,14 @@
+# Migrations
+migrations/versions/*.py
+
+# Logs
 *.log
 app.log.*
+
+# Databases
 *.db
+
+# Other
 playground.py
 
 # Byte-compiled / optimized / DLL files
