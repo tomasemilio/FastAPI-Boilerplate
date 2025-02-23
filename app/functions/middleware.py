@@ -17,10 +17,10 @@ logger = logging.getLogger(__name__)
 async def lifespan(_: FastAPI):
     setup_logger()
     logger.warning(f"Starting the application: ENV={config.ENV_STATE}")
+    await drop_all()
     await create_all()
     await create_admin_user()
     yield
-    await drop_all()
     logger.warning("Shutting down the application")
 
 

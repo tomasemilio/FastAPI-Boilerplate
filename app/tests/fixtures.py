@@ -48,3 +48,17 @@ async def created_post(async_client: AsyncClient, created_user: Response):
         json=dict(title="test", content="test"),
         headers={"Authorization": f"Bearer {token}"},
     )
+
+
+@pytest.fixture
+async def created_tag(async_client: AsyncClient, created_user: Response):
+    token = await get_token(
+        username=created_user.json()["email"],
+        password="123",
+        async_client=async_client,
+    )
+    return await async_client.post(
+        "/api/v1/tag",
+        json=dict(name="name", description="description"),
+        headers={"Authorization": f"Bearer {token}"},
+    )

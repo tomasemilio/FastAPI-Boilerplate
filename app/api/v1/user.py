@@ -1,20 +1,20 @@
-from fastapi import APIRouter, BackgroundTasks, Depends, Security
+from fastapi import APIRouter, BackgroundTasks
 from pydantic import EmailStr
 
 from app.config import config
 from app.database.dependencies import sessDep
 from app.functions.emailer import send_email
-from app.models.auth.functions import authorize_and_load
+from app.models.auth.dependencies import authorizeLoadDep, resetLoadDep
 from app.models.auth.role import Role
 from app.models.auth.token import Token
 from app.models.user import User
-from app.models.user.schemas import PasswordsIn, UserOut
+from app.models.user.schemas import PasswordsIn, UserDetailOut
 
 router = APIRouter(prefix="/user", tags=["User"])
 
 
-@router.get("/me", response_model=UserOut, status_code=200)
-async def me(user: User = Depends(authorize_and_load)):
+@router.get("/me", response_model=UserDetailOut, status_code=200)
+async def me(user: authorizeLoadDep):
     return user
 
 
@@ -40,15 +40,15 @@ async def request_reset_password(
     return {"message": f"Reset password email sent to {email}"}
 
 
-@router.post("/reset-password", status_code=200, response_model=UserOut)
+@router.post("/reset-password", status_code=200, response_model=UserDetailOut)
 async def reset_password(
     async_session: sessDep,
     passwords: PasswordsIn,
-    user: User = Security(authorize_and_load, scopes=[Role.RESET]),
+    user: resetLoadDep,
     token: str | None = None,  # noqa: F841
 ):
     user = await User.get(
-        async_session, id=user.id
+        async_session, id=user.id, relationships=[User.posts, User.tags]
     )  # sessDep not cached when using Security Scopes
     return await user.update(
         async_session, verified=True, password=passwords.password.get_secret_value()

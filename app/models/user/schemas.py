@@ -1,9 +1,9 @@
-from datetime import datetime
 from typing import Annotated, ClassVar
 from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr, model_validator
 
+from app.database.schemas import BaseOut
 from app.functions.exceptions import unprocessable_entity
 from app.models.auth.role import Role
 
@@ -24,15 +24,12 @@ class UserIn(BaseModel):
     scope: list[Role] = [Role.USER]
 
 
-class UserOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    id: str
-    created_at: datetime
-    updated_at: datetime
-    name: str
-    email: EmailStr
-    verified: bool
-    scope: list[Role]
+class UserUpdate(BaseModel):
+    name: str | None = None
+    email: EmailStr | None = None
+    password: str | None = None
+    verified: bool | None = None
+    scope: list[Role] | None = None
 
 
 class PasswordsIn(BaseModel):
@@ -44,3 +41,19 @@ class PasswordsIn(BaseModel):
         if self.password.get_secret_value() != self.confirm_password.get_secret_value():
             raise unprocessable_entity("Passwords do not match")
         return self
+
+
+class UserOut(BaseOut):
+    name: str
+    email: EmailStr
+    verified: bool
+    scope: list[Role]
+
+
+from app.models.post.schemas import PostOut
+from app.models.tag.schemas import TagOut
+
+
+class UserDetailOut(UserOut):
+    posts: list[PostOut]
+    tags: list[TagOut]

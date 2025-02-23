@@ -37,10 +37,40 @@ We use the `TestConfig` to run tests
 bash test.sh
 ```
 
-### Features
+## Features
 
-- Routes / Crud.
-- Base models with database persistence and relationships.
-- Multiple configuration files.
-- User authentication, authorization, and route protection.
-- Logging
+- **Asynchronous SQLAlchemy**: Utilizes SQLAlchemy's asynchronous capabilities to handle database operations efficiently.
+- **FastAPI Framework**: Leverages FastAPI for building high-performance APIs with Python 3.8+.
+- **Pydantic for Data Validation**: Employs Pydantic models to ensure data integrity and validation.
+- **OAuth2 Authentication**: Implements OAuth2 protocols for secure user authentication and authorization.
+- **Comprehensive Logging**: Incorporates logging to monitor application behavior and facilitate debugging.
+- **Environment-Based Configurations**: Supports multiple configurations (Test, Development, Production) to adapt to various deployment scenarios.
+
+## Project Structure
+
+The application models three primary entities:
+
+- **User**: Represents the application's users.
+- **Post**: Denotes content created by users.
+- **Tag**: Categorizes posts for better organization.
+
+Relationships between these models are defined as follows:
+
+- A **User** can have multiple **Tags**.
+- A **User** can create multiple **Posts**.
+- **Posts** and **Tags** share a many-to-many relationship, managed through an association table.
+
+This design facilitates efficient data retrieval and manipulation, adhering to best practices in database normalization.
+
+## Efficient Relationship Loading
+
+To optimize performance, the framework employs selective relationship loading strategies:
+
+- When fetching multiple records of a model, related entities are not loaded by default, reducing unnecessary database queries.
+- When retrieving a single record, typically by its ID, related entities are eagerly loaded to provide comprehensive data in one query.
+
+This approach balances performance with data availability, ensuring efficient resource utilization.
+
+## Base Model Class
+
+The project defines a custom `Base` class that all models inherit from. This class includes common configurations and behaviors, promoting code reusability and consistency across the application's data models.

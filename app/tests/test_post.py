@@ -19,13 +19,14 @@ async def test_post(
         async_client=async_client,
     )
     post_id = created_post.json()["id"]
+    user_id = created_user.json()["id"]
     response = await async_client.get(
         f"/api/v1/post/{post_id}",
         headers={"Authorization": f"Bearer {user_token}"},
     )
     assert response.status_code == 200
     response = await async_client.delete(
-        f"/api/v1/admin/user/{created_user.json()['id']}",
+        f"/api/v1/admin/user/{user_id}",
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert response.status_code == 204
@@ -35,7 +36,7 @@ async def test_post(
     )
     assert response.status_code == 404
     response = await async_client.get(
-        f"/api/v1/user/{post_id}",
+        f"/api/v1/user/{user_id}",
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert response.status_code == 404
